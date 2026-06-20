@@ -204,9 +204,20 @@ const LandingPage = () => {
     }
   };
 
-  const handleCtaClick = () => {
+  const handleCtaClick = async () => {
     if (isLoggedIn) {
-      navigate('/dashboard');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const email = session?.user?.email?.toLowerCase();
+        const ADMIN_EMAILS = ['sunnykiran715@gmail.com', 'revanthrevanth4248@gmail.com'];
+        if (email && ADMIN_EMAILS.includes(email)) {
+          navigate('/admin/dashboard');
+        } else {
+          navigate('/dashboard');
+        }
+      } catch (err) {
+        navigate('/dashboard');
+      }
     } else {
       navigate('/register');
     }

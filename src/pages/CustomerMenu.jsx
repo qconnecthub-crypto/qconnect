@@ -185,9 +185,7 @@ const CustomerMenu = () => {
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'shops', filter: `id=eq.${shop.id}` }, (payload) => {
         setShop(payload.new);
       })
-      .subscribe((status) => {
-        console.log(`[Realtime] Shop Channel status: ${status}`);
-      });
+      .subscribe();
       
     const catChannel = supabase.channel(`customer-categories-${shop.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'categories', filter: `shop_id=eq.${shop.id}` }, (payload) => {
@@ -195,9 +193,7 @@ const CustomerMenu = () => {
         else if (payload.eventType === 'UPDATE') setCategories(prev => prev.map(c => c.id === payload.new.id ? payload.new : c));
         else if (payload.eventType === 'DELETE') setCategories(prev => prev.filter(c => c.id !== payload.old.id));
       })
-      .subscribe((status) => {
-        console.log(`[Realtime] Categories Channel status: ${status}`);
-      });
+      .subscribe();
       
     const itemsChannel = supabase.channel(`customer-items-${shop.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'items' }, async (payload) => {
@@ -225,9 +221,7 @@ const CustomerMenu = () => {
           });
         }
       })
-      .subscribe((status) => {
-        console.log(`[Realtime] Items Channel status: ${status}`);
-      });
+      .subscribe();
 
     return () => {
       supabase.removeChannel(shopChannel);
@@ -242,9 +236,7 @@ const CustomerMenu = () => {
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${activeOrder.id}` }, (payload) => {
         setActiveOrder(prev => ({ ...prev, ...payload.new }));
       })
-      .subscribe((status) => {
-        console.log(`[Realtime] Active Order Channel status: ${status}`);
-      });
+      .subscribe();
       
     return () => supabase.removeChannel(channel);
   }, [activeOrder]);

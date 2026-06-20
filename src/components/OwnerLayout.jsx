@@ -12,6 +12,7 @@ import {
   Coffee,
   FileText,
   ClipboardList,
+  Shield,
   X
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -77,16 +78,31 @@ const OwnerLayout = ({ activeTab }) => {
     };
   }, [currentTab, shop?.name, t]);
 
-  // Navigation Items for Desktop Sidebar
-  const sidebarItems = [
-    { id: 'dashboard', label: t.dashboard, path: '/dashboard', icon: LayoutGrid },
-    { id: 'menu', label: t.menu, path: '/menu-builder', icon: Utensils },
-    { id: 'qr-code', label: t.qrCodes, path: '/qr-code', icon: QrCode },
-    { id: 'orders', label: t.orders, path: '/orders', icon: ClipboardList },
-    { id: 'feedback', label: t.feedback, path: '/feedback', icon: MessageSquare },
-    { id: 'history', label: t.history, path: '/history', icon: History },
-    { id: 'settings', label: t.settings, path: '/settings', icon: Settings }
+  // Whitelisted admin emails
+  const ADMIN_EMAILS = [
+    'sunnykiran715@gmail.com',
+    'revanthrevanth4248@gmail.com'
   ];
+
+  // Navigation Items for Desktop Sidebar
+  const getSidebarItems = () => {
+    const items = [
+      { id: 'dashboard', label: t.dashboard, path: '/dashboard', icon: LayoutGrid },
+      { id: 'menu', label: t.menu, path: '/menu-builder', icon: Utensils },
+      { id: 'qr-code', label: t.qrCodes, path: '/qr-code', icon: QrCode },
+      { id: 'orders', label: t.orders, path: '/orders', icon: ClipboardList },
+      { id: 'feedback', label: t.feedback, path: '/feedback', icon: MessageSquare },
+      { id: 'history', label: t.history, path: '/history', icon: History },
+      { id: 'settings', label: t.settings, path: '/settings', icon: Settings }
+    ];
+
+    if (user && ADMIN_EMAILS.includes(user.email?.toLowerCase())) {
+      items.push({ id: 'admin', label: 'Admin Panel', path: '/admin/dashboard', icon: Shield });
+    }
+    return items;
+  };
+
+  const sidebarItems = getSidebarItems();
 
   useEffect(() => {
     let isMounted = true;
@@ -109,6 +125,12 @@ const OwnerLayout = ({ activeTab }) => {
         if (shops && shops.length > 0) {
           const s = shops[0];
           setShop(s);
+
+          // Skip loading other features if shop is pending approval
+          if (s.is_approved === false) {
+            setLoading(false);
+            return;
+          }
 
           // Fetch notifications
           const { data: notifs } = await supabase.from('notifications')
@@ -250,6 +272,120 @@ const OwnerLayout = ({ activeTab }) => {
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--color-bg)' }}>
         <div style={{ width: '40px', height: '40px', border: '4px solid var(--color-surface)', borderTop: '4px solid var(--color-accent)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
         <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (shop && shop.is_approved === false) {
+    const handleLogout = async () => {
+      await supabase.auth.signOut();
+      navigate('/register');
+    };
+
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%)',
+        padding: '2rem',
+        color: '#f1f5f9',
+        fontFamily: 'var(--font-body)'
+      }}>
+        <div style={{
+          width: '100%',
+          maxWidth: '520px',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '20px',
+          padding: '2.5rem',
+          backdropFilter: 'blur(20px)',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            background: 'rgba(201, 149, 42, 0.1)',
+            color: 'var(--color-accent, #c9952a)',
+            padding: '16px',
+            borderRadius: '50%',
+            width: '80px',
+            height: '80px',
+            margin: '0 auto 1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <span style={{ fontSize: '2.5rem', animation: 'pulse 2s infinite' }}>⏳</span>
+          </div>
+
+          <h2 style={{ fontSize: '1.75rem', fontWeight: 700, margin: '0 0 1rem', color: '#e2e8f0' }}>
+            Pending Approval
+          </h2>
+          
+          <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem' }}>
+            Hello <strong>{shop.owner_name}</strong>, your registration for <strong>{shop.name}</strong> was submitted successfully! 
+            Your account is currently waiting for admin approval. You will gain full access once a developer reviews your request.
+          </p>
+
+          <div style={{
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '12px',
+            padding: '1.25rem',
+            textAlign: 'left',
+            marginBottom: '2rem',
+            fontSize: '0.85rem'
+          }}>
+            <h4 style={{ margin: '0 0 0.75rem', color: '#cbd5e1', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Submitted Details:</h4>
+            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr', gap: '8px', color: '#94a3b8' }}>
+              <span>Shop:</span> <strong style={{ color: '#e2e8f0' }}>{shop.name}</strong>
+              <span>Owner:</span> <strong style={{ color: '#e2e8f0' }}>{shop.owner_name}</strong>
+              <span>Mobile:</span> <strong style={{ color: '#e2e8f0' }}>{shop.mobile}</strong>
+              {shop.email && (
+                <>
+                  <span>Email:</span> <strong style={{ color: '#e2e8f0' }}>{shop.email}</strong>
+                </>
+              )}
+              {shop.address && (
+                <>
+                  <span>Address:</span> <strong style={{ color: '#e2e8f0' }}>{shop.address}</strong>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary" 
+              style={{ padding: '12px 24px', borderRadius: '30px', fontWeight: '600' }}
+            >
+              Check Status
+            </button>
+            <button 
+              onClick={handleLogout} 
+              style={{ 
+                padding: '12px 24px', 
+                backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+                color: '#f87171', 
+                border: '1px solid rgba(239, 68, 68, 0.2)', 
+                borderRadius: '30px', 
+                fontWeight: '600',
+                cursor: 'pointer'
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+        <style>{`
+          @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+          }
+        `}</style>
       </div>
     );
   }

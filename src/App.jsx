@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { supabase } from './lib/supabase';
 import { LanguageProvider } from './contexts/LanguageContext';
 import OwnerLayout from './components/OwnerLayout';
+import AdminLayout from './components/AdminLayout';
 import ErrorBoundary from './components/ErrorBoundary';
 import CustomCursor from './components/CustomCursor';
 
@@ -23,6 +24,11 @@ const ReceiptView = React.lazy(() => import('./pages/ReceiptView'));
 const Terms = React.lazy(() => import('./pages/Terms'));
 const About = React.lazy(() => import('./pages/About'));
 const Contact = React.lazy(() => import('./pages/Contact'));
+
+// Admin Pages (Developer Only)
+const AdminLogin = React.lazy(() => import('./pages/AdminLogin'));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard'));
+const AdminOwners = React.lazy(() => import('./pages/AdminOwners'));
 
 // Fast loading fallback
 const Loader = () => (
@@ -103,6 +109,13 @@ function App() {
                 <Route path="/history" element={<BillHistory />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/feedback" element={<Feedback />} />
+              </Route>
+
+              {/* Admin Panel Routes (Developer Only) */}
+              <Route path="/admin" element={<AdminLogin />} />
+              <Route element={<AdminLayout />}>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/owners" element={<AdminOwners />} />
               </Route>
 
               {/* Catch-all: redirect any unknown route to dashboard */}
