@@ -101,6 +101,11 @@ const BillHistory = () => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
   };
 
+  const viewReceipt = (e, bill) => {
+    e.stopPropagation();
+    window.open(`/receipt/${bill.id}`, '_blank');
+  };
+
   // Download a single bill as a text receipt
   const downloadBill = (e, bill) => {
     e.stopPropagation();
@@ -211,8 +216,8 @@ const BillHistory = () => {
                       
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <button
-                          onClick={(e) => downloadBill(e, bill)}
-                          title="Download Bill"
+                          onClick={(e) => viewReceipt(e, bill)}
+                          title="View Receipt"
                           style={{ background: 'rgba(255,109,0,0.1)', border: 'none', borderRadius: '8px', padding: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         >
                           <Download size={16} color="var(--color-accent)" />

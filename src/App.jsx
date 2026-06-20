@@ -19,6 +19,7 @@ const Settings = React.lazy(() => import('./pages/Settings'));
 const BillHistory = React.lazy(() => import('./pages/BillHistory'));
 const Feedback = React.lazy(() => import('./pages/Feedback'));
 const PrivacyPolicy = React.lazy(() => import('./pages/PrivacyPolicy'));
+const ReceiptView = React.lazy(() => import('./pages/ReceiptView'));
 const Terms = React.lazy(() => import('./pages/Terms'));
 const About = React.lazy(() => import('./pages/About'));
 const Contact = React.lazy(() => import('./pages/Contact'));
@@ -85,6 +86,7 @@ function App() {
               <Route path="/register" element={<RegisterLogin />} />
               <Route path="/shop-setup" element={<ShopDetails />} />
               <Route path="/menu/:shopId" element={<CustomerMenu />} />
+              <Route path="/receipt/:orderId" element={<ReceiptView />} />
               
               {/* Public Informational / Legal pages */}
               <Route path="/privacy" element={<PrivacyPolicy />} />
