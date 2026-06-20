@@ -238,6 +238,11 @@ const CustomerMenu = () => {
     return newCart;
   });
 
+  const clearCart = () => {
+    setCart({});
+    localStorage.removeItem(`cart_${shopId}`);
+  };
+
   const getCartTotal = () => {
     let total = 0;
     Object.keys(cart).forEach(itemId => {
@@ -433,7 +438,9 @@ const CustomerMenu = () => {
       <Cart 
         cart={cart}
         items={items}
+        addToCart={addToCart}
         removeFromCart={removeFromCart}
+        clearCart={clearCart}
         getCartTotal={getCartTotal}
         getCartItemCount={getCartItemCount}
         isCartOpen={isCartOpen}

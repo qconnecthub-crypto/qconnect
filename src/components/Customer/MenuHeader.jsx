@@ -12,7 +12,7 @@ const MenuHeader = ({ shop, isDarkMode, lang, setLang, t }) => {
           zIndex: 9999,
           backdropFilter: 'blur(16px) saturate(120%)',
           WebkitBackdropFilter: 'blur(16px) saturate(120%)',
-          backgroundColor: 'rgba(7, 10, 19, 0.6)',
+          backgroundColor: 'rgba(7, 10, 19, 0.65)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -63,63 +63,66 @@ const MenuHeader = ({ shop, isDarkMode, lang, setLang, t }) => {
         </div>
       )}
 
-      <header style={{ padding: '2rem 1.25rem 1rem 1.25rem' }}>
-        <div className="customer-header-card">
-          <div className="customer-header-logo">
-            {shop.logo_url ? (
-              <img src={shop.logo_url} alt={`${shop.name} logo`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
-            ) : (
-              <span style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.05))' }}>☕</span>
-            )}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h1 className="customer-shop-title" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{shop.name}</h1>
-            <p className="customer-proprietor" style={{ margin: '0.25rem 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Proprietor: {shop.owner_name}
-            </p>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', flexShrink: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%', boxShadow: '0 0 8px #10b981' }}></span>
-              <span style={{ fontSize: '11px', fontWeight: '700', color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Menu live</span>
+      <header className="customer-header-container">
+        <div className="customer-header-banner">
+          <div className="customer-header-overlay">
+            <div className="customer-header-logo">
+              {shop.logo_url ? (
+                <img src={shop.logo_url} alt={`${shop.name} logo`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+              ) : (
+                <span>☕</span>
+              )}
             </div>
-            
-            {/* Language Switcher Pill */}
-            <button 
-              aria-label={`Switch language to ${lang === 'EN' ? 'Telugu' : 'English'}`}
-              style={{ 
-                display: 'flex', 
-                backgroundColor: 'var(--bg-secondary)', 
-                border: '1px solid var(--pill-border)', 
-                borderRadius: '30px', 
-                padding: '3px', 
-                cursor: 'pointer',
-                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.05)',
-                transition: 'all 0.2s'
-              }} 
-              onClick={() => setLang(lang === 'EN' ? 'TE' : 'EN')}
-            >
-              <div style={{ 
-                padding: '3px 10px', 
-                borderRadius: '20px', 
-                backgroundColor: lang === 'TE' ? 'var(--color-accent)' : 'transparent', 
-                color: lang === 'TE' ? 'white' : 'var(--text-secondary)', 
-                fontWeight: '800', 
-                fontSize: '0.7rem', 
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: lang === 'TE' ? '0 2px 6px rgba(var(--color-accent-rgb), 0.2)' : 'none'
-              }}>TE</div>
-              <div style={{ 
-                padding: '3px 10px', 
-                borderRadius: '20px', 
-                backgroundColor: lang === 'EN' ? 'var(--color-accent)' : 'transparent', 
-                color: lang === 'EN' ? 'white' : 'var(--text-secondary)', 
-                fontWeight: '800', 
-                fontSize: '0.7rem', 
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: lang === 'EN' ? '0 2px 6px rgba(var(--color-accent-rgb), 0.2)' : 'none'
-              }}>EN</div>
-            </button>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 className="customer-shop-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{shop.name}</h1>
+              <p className="customer-proprietor" style={{ margin: '0.25rem 0 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                Proprietor: {shop.owner_name}
+              </p>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', flexShrink: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ width: '8px', height: '8px', backgroundColor: '#10b981', borderRadius: '50%', boxShadow: '0 0 8px #10b981' }}></span>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Menu live</span>
+              </div>
+              
+              {/* Language Switcher Pill */}
+              <button 
+                aria-label={`Switch language to ${lang === 'EN' ? 'Telugu' : 'English'}`}
+                style={{ 
+                  display: 'flex', 
+                  backgroundColor: 'rgba(7, 10, 19, 0.65)', 
+                  border: '1px solid rgba(255, 255, 255, 0.1)', 
+                  borderRadius: '30px', 
+                  padding: '3px', 
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.2)',
+                  transition: 'all 0.2s'
+                }} 
+                onClick={() => setLang(lang === 'EN' ? 'TE' : 'EN')}
+              >
+                <div style={{ 
+                  padding: '3px 10px', 
+                  borderRadius: '20px', 
+                  backgroundColor: lang === 'TE' ? 'var(--color-accent)' : 'transparent', 
+                  color: 'white', 
+                  fontWeight: '800', 
+                  fontSize: '0.7rem', 
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: lang === 'TE' ? '0 2px 6px rgba(var(--color-accent-rgb), 0.2)' : 'none'
+                }}>TE</div>
+                <div style={{ 
+                  padding: '3px 10px', 
+                  borderRadius: '20px', 
+                  backgroundColor: lang === 'EN' ? 'var(--color-accent)' : 'transparent', 
+                  color: 'white', 
+                  fontWeight: '800', 
+                  fontSize: '0.7rem', 
+                  transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                  boxShadow: lang === 'EN' ? '0 2px 6px rgba(var(--color-accent-rgb), 0.2)' : 'none'
+                }}>EN</div>
+              </button>
+            </div>
           </div>
         </div>
       </header>

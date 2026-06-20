@@ -1,5 +1,25 @@
-import React from 'react';
-import { Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, SlidersHorizontal, Heart } from 'lucide-react';
+
+const isVegItem = (itemName) => {
+  const lower = itemName.toLowerCase();
+  if (lower.includes('chicken') || lower.includes('egg') || lower.includes('meat') || lower.includes('fish') || lower.includes('mutton') || lower.includes('pork') || lower.includes('nonveg') || lower.includes('non-veg')) {
+    return false;
+  }
+  return true; // Default to veg
+};
+
+const getItemBadge = (itemName) => {
+  const lower = itemName.toLowerCase();
+  if (lower.includes('masala') || lower.includes('lemon') || lower.includes('bestseller')) {
+    return 'bestseller';
+  }
+  if (lower.includes('ginger') || lower.includes('popular') || lower.includes('tea')) {
+    // Only give ginger or designated tea popular status to match layout
+    if (lower.includes('ginger') || lower.includes('popular')) return 'popular';
+  }
+  return null;
+};
 
 const MenuGrid = ({ 
   categories, 
@@ -9,12 +29,18 @@ const MenuGrid = ({
   searchQuery, 
   setSearchQuery, 
   addToCart, 
-  removeFromCart, // Added to allow decrement from card
+  removeFromCart, 
   cart, 
   isDarkMode, 
   t, 
   getIcon 
 }) => {
+  const [favorites, setFavorites] = useState({});
+
+  const toggleFavorite = (itemId) => {
+    setFavorites(prev => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
+
   const filteredItems = items.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -35,7 +61,7 @@ const MenuGrid = ({
           className={`customer-pill ${activeCategoryId === 'all' ? 'active' : ''}`} 
           onClick={() => setActiveCategoryId('all')}
         >
-          All Items
+          All
         </button>
         {categories.map(cat => (
           <button 
@@ -43,7 +69,7 @@ const MenuGrid = ({
             className={`customer-pill ${activeCategoryId === cat.id ? 'active' : ''}`}
             onClick={() => setActiveCategoryId(cat.id)}
           >
-            <span style={{ fontSize: '1.1rem' }}>{getIcon(cat.name, 'category')}</span> {cat.name}
+            <span style={{ fontSize: '1rem' }}>{getIcon(cat.name, 'category')}</span> {cat.name}
           </button>
         ))}
       </nav>
@@ -53,11 +79,12 @@ const MenuGrid = ({
           <Search size={18} color="var(--text-secondary)" style={{ flexShrink: 0 }} />
           <input 
             type="text" 
-            placeholder={t.searchItems} 
+            placeholder="Search for dishes, tea, coffee..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             aria-label="Search menu items"
           />
+          <SlidersHorizontal size={18} color="var(--text-secondary)" style={{ flexShrink: 0, cursor: 'pointer' }} />
         </div>
       </div>
 
@@ -77,18 +104,47 @@ const MenuGrid = ({
               <div className="customer-menu-grid">
                 {itemsByCategory[cat.id].map(item => {
                   const qty = cart[item.id] || 0;
+                  const isVeg = isVegItem(item.name);
+                  const badge = getItemBadge(item.name);
+                  const isFav = !!favorites[item.id];
+                  
                   return (
                     <div 
                       key={item.id} 
-                      className={`customer-item-card ${!item.is_available ? 'out-of-stock' : ''}`}
+                      className="customer-item-card"
                       style={{ opacity: item.is_available ? 1 : 0.6 }}
                     >
                       <div className="customer-item-icon-wrapper">
+                        {/* Bestseller / Popular Badge overlay */}
+                        {badge === 'bestseller' && (
+                          <div className="customer-card-badge customer-card-badge-bestseller">
+                            ★ Bestseller
+                          </div>
+                        )}
+                        {badge === 'popular' && (
+                          <div className="customer-card-badge customer-card-badge-popular">
+                            ✦ Popular
+                          </div>
+                        )}
+
+                        {/* Heart Wishlist Overlay */}
+                        <button 
+                          className={`customer-card-heart ${isFav ? 'active' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleFavorite(item.id);
+                          }}
+                          aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+                        >
+                          <Heart size={15} fill={isFav ? "#ef4444" : "transparent"} color={isFav ? "#ef4444" : "currentColor"} />
+                        </button>
+
                         {item.image_url ? (
                           <img src={item.image_url} alt={item.name} loading="lazy" />
                         ) : (
                           <span>{getIcon(item.name, 'item')}</span>
                         )}
+                        
                         {!item.is_available && (
                           <div className="customer-item-out-overlay">
                             Out of stock
@@ -97,45 +153,50 @@ const MenuGrid = ({
                       </div>
                       
                       <div className="customer-item-content">
-                        <div>
-                          <h3 className="customer-item-title">{item.name}</h3>
-                          {item.description && (
-                            <p className="customer-item-desc">{item.description}</p>
-                          )}
+                        <div className="customer-item-header">
+                          <div className={`customer-veg-indicator ${isVeg ? 'veg' : 'non-veg'}`}>
+                            <div className="customer-veg-dot"></div>
+                          </div>
+                          <h3 className="customer-item-title" title={item.name}>{item.name}</h3>
                         </div>
                         
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: '8px' }}>
+                        {item.description && (
+                          <p className="customer-item-desc">{item.description}</p>
+                        )}
+                        
+                        <div className="customer-price-row">
                           <span className="customer-item-price">₹{item.price}</span>
-                          
-                          {qty > 0 ? (
-                            <div className="customer-qty-selector">
-                              <button 
-                                className="customer-qty-btn"
-                                onClick={() => removeFromCart(item.id)}
-                                aria-label={`Remove one ${item.name} from order`}
-                              >
-                                -
-                              </button>
-                              <span className="customer-qty-value">{qty}</span>
-                              <button 
-                                className="customer-qty-btn"
-                                onClick={() => addToCart(item.id)}
-                                aria-label={`Add one more ${item.name} to order`}
-                              >
-                                +
-                              </button>
-                            </div>
-                          ) : (
+                          {qty === 0 && (
                             <button 
-                              className="customer-add-btn" 
+                              className="customer-card-add-btn" 
                               onClick={() => addToCart(item.id)}
                               disabled={!item.is_available}
                               aria-label={`Add ${item.name} to order`}
                             >
-                              ADD
+                              + Add
                             </button>
                           )}
                         </div>
+
+                        {qty > 0 && (
+                          <div className="customer-card-counter-container">
+                            <div className="customer-card-counter">
+                              <button 
+                                onClick={() => removeFromCart(item.id)}
+                                aria-label={`Decrease quantity of ${item.name}`}
+                              >
+                                -
+                              </button>
+                              <span>{qty}</span>
+                              <button 
+                                onClick={() => addToCart(item.id)}
+                                aria-label={`Increase quantity of ${item.name}`}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
