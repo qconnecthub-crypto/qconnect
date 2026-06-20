@@ -120,7 +120,7 @@ const CustomerMenu = () => {
       let currentShop = null;
 
       if (isUUID(shopId)) {
-        const { data: tableData } = await supabase.from('shop_tables').select('*, shops(*)').eq('token', shopId).single();
+        const { data: tableData } = await supabase.from('shop_tables').select('*, shops(*)').eq('table_token', shopId).single();
         if (tableData) {
           if (!tableData.is_active) {
             setIsTableDeactivated(true);
