@@ -148,7 +148,7 @@ const MenuGrid = ({
                           borderRadius: '16px',
                           display: 'flex',
                           alignItems: 'center',
-                          justifycontent: 'center',
+                          justifyContent: 'center',
                           flexShrink: 0,
                           overflow: 'hidden',
                           position: 'relative'
