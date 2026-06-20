@@ -223,17 +223,9 @@ const Cart = ({
             {/* Calculations & Checkout */}
             {Object.keys(cart).length > 0 && (
               <div style={{ paddingTop: '1rem', borderTop: '1px solid var(--pill-border)', marginTop: 'auto' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Subtotal</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>₹{getCartTotal()}</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Packaging Fee</span>
-                  <span style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-primary)' }}>₹10</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', borderTop: '1px dashed var(--pill-border)', paddingTop: '0.6rem' }}>
-                  <span style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--text-primary)' }}>Total</span>
-                  <span style={{ fontSize: '1.45rem', fontWeight: '800', color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}>₹{getCartTotal() + 10}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
+                  <span style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-primary)' }}>Total</span>
+                  <span style={{ fontSize: '1.45rem', fontWeight: '800', color: 'var(--text-primary)', fontFamily: 'var(--font-heading)' }}>₹{getCartTotal()}</span>
                 </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
