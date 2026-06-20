@@ -38,14 +38,20 @@ const Dashboard = () => {
           .limit(5);
         if (active && fbs) setFeedbacks(fbs);
 
-        // Fetch delivered orders today for revenue and order count
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const getOperatingDayStart = () => {
+          const now = new Date();
+          const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 12, 0, 0);
+          if (now < start) {
+            start.setDate(start.getDate() - 1);
+          }
+          return start;
+        };
+        const startOfToday = getOperatingDayStart();
         const { data: deliveredToday } = await supabase.from('orders')
           .select('total_amount')
           .eq('shop_id', shop.id)
           .eq('status', 'delivered')
-          .gte('created_at', today.toISOString());
+          .gte('created_at', startOfToday.toISOString());
         
         if (active && deliveredToday) {
           const revenue = deliveredToday.reduce((sum, o) => sum + (o.total_amount || 0), 0);
@@ -85,14 +91,21 @@ const Dashboard = () => {
 
     const syncStats = async () => {
       try {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const getOperatingDayStart = () => {
+          const now = new Date();
+          const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 12, 0, 0);
+          if (now < start) {
+            start.setDate(start.getDate() - 1);
+          }
+          return start;
+        };
+        const startOfToday = getOperatingDayStart();
 
         const { data: deliveredToday } = await supabase.from('orders')
           .select('total_amount')
           .eq('shop_id', shop.id)
           .eq('status', 'delivered')
-          .gte('created_at', today.toISOString());
+          .gte('created_at', startOfToday.toISOString());
         
         if (active && deliveredToday) {
           const revenue = deliveredToday.reduce((sum, o) => sum + (o.total_amount || 0), 0);

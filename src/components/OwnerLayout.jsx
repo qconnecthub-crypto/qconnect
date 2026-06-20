@@ -131,10 +131,21 @@ const OwnerLayout = ({ activeTab }) => {
           if (!isMounted) return;
           if (activeOrders) setOrders(activeOrders);
 
+          const getOperatingDayStart = () => {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 12, 0, 0);
+            if (now < start) {
+              start.setDate(start.getDate() - 1);
+            }
+            return start;
+          };
+          const startOfToday = getOperatingDayStart();
+
           // Fetch initial menu views
           const { count: viewsCount } = await supabase.from('menu_views')
             .select('*', { count: 'exact', head: true })
-            .eq('shop_id', s.id);
+            .eq('shop_id', s.id)
+            .gte('created_at', startOfToday.toISOString());
           if (!isMounted) return;
           if (viewsCount !== null) setMenuViews(viewsCount);
 
@@ -204,6 +215,25 @@ const OwnerLayout = ({ activeTab }) => {
       }
     };
 
+    const getTimeUntilNextCutoff = () => {
+      const now = new Date();
+      const nextCutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 12, 0, 0);
+      if (now >= nextCutoff) {
+        nextCutoff.setDate(nextCutoff.getDate() + 1);
+      }
+      return nextCutoff.getTime() - now.getTime();
+    };
+
+    let timer;
+    const scheduleReset = () => {
+      const ms = getTimeUntilNextCutoff();
+      timer = setTimeout(() => {
+        fetchData();
+        scheduleReset();
+      }, ms);
+    };
+    scheduleReset();
+
     fetchData();
 
     return () => {
@@ -211,6 +241,7 @@ const OwnerLayout = ({ activeTab }) => {
       if (channel) {
         supabase.removeChannel(channel);
       }
+      clearTimeout(timer);
     };
   }, [navigate]);
 

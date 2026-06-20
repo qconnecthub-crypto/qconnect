@@ -10,12 +10,16 @@ const BillHistory = () => {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dateFilter, setDateFilter] = useState(() => {
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
+    const now = new Date();
+    const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 12, 0, 0);
+    if (now < cutoff) {
+      now.setDate(now.getDate() - 1);
+    }
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
     return `${yyyy}-${mm}-${dd}`;
-  }); // YYYY-MM-DD local format
+  }); // YYYY-MM-DD local format with 12:12 AM cutoff
   const [expandedBillId, setExpandedBillId] = useState(null);
   const { t } = useLanguage();
 
@@ -34,8 +38,9 @@ const BillHistory = () => {
 
         if (dateFilter) {
           const [year, month, day] = dateFilter.split('-').map(Number);
-          const startOfDay = new Date(year, month - 1, day, 0, 0, 0, 0);
-          const endOfDay = new Date(year, month - 1, day, 23, 59, 59, 999);
+          const startOfDay = new Date(year, month - 1, day, 0, 12, 0, 0);
+          const endOfDay = new Date(year, month - 1, day, 0, 11, 59, 999);
+          endOfDay.setDate(endOfDay.getDate() + 1);
           
           query = query
             .gte('created_at', startOfDay.toISOString())
