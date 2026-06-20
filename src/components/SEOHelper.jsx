@@ -28,7 +28,7 @@ export default function SEOHelper({ title, description, canonical }) {
       linkCanonical.rel = 'canonical';
       document.head.appendChild(linkCanonical);
     }
-    const targetCanonical = canonical || `https://qconnect.menu${location.pathname}`;
+    const targetCanonical = canonical || `https://qconnecthub.netlify.app${location.pathname}`;
     linkCanonical.setAttribute('href', targetCanonical);
   }, [title, description, canonical, location]);
 

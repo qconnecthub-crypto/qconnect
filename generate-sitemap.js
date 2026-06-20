@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = 'https://qconnect.menu';
+const BASE_URL = 'https://qconnecthub.netlify.app';
 const pages = [
   { url: '/', changefreq: 'daily', priority: '1.0' },
   { url: '/about', changefreq: 'weekly', priority: '0.8' },

@@ -13,4 +13,4 @@ Disallow: /register
 # Allow public menu pages
 Allow: /menu/
 
-Sitemap: https://qconnect.menu/sitemap.xml
+Sitemap: https://qconnecthub.netlify.app/sitemap.xml
