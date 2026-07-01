@@ -33,21 +33,29 @@ const AdminOwners = () => {
   const [filter, setFilter] = useState('all');
   const [toast, setToast] = useState(null);
 
+  const [dbError, setDbError] = useState(null);
+
   const refreshDB = useCallback(async () => {
     if (isMockMode) {
       setDb(getDB());
+      setDbError(null);
     } else {
       try {
         const { data: shops, error } = await supabase.from('shops').select('*');
-        if (error) throw error;
+        if (error) {
+          setDbError(`Shops query failed: ${error.message} (${error.code})`);
+          return;
+        }
         setDb({
           shops: shops || [],
           registrations: [],
           users: [], // placeholder for owner checks compatibility
           shop_tables: []
         });
+        setDbError(null);
       } catch (err) {
         console.error('Error fetching shops in AdminOwners:', err);
+        setDbError(`Unexpected error: ${err.message || err}`);
       }
     }
   }, []);
@@ -183,8 +191,25 @@ const AdminOwners = () => {
         color: isMockMode ? '#f87171' : '#34d399'
       }}>
         <span>Database Mode: {isMockMode ? '⚠️ Mock Mode (Local Storage)' : '🟢 Real Supabase Connected'}</span>
-        {!isMockMode && <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>URL: {supabase.supabaseUrl}</span>}
       </div>
+      {dbError && (
+        <div style={{
+          padding: '16px',
+          borderRadius: '12px',
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          color: '#fca5a5',
+          marginBottom: '20px',
+          fontSize: '0.9rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <span style={{ fontWeight: 'bold' }}>⚠️ Database Query Error:</span>
+          <span>{dbError}</span>
+          <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Please verify that you have run all SQL migration scripts in your Supabase SQL editor.</span>
+        </div>
+      )}
       <style>{`
         .admin-owners-page { animation: fadeInAdmin 0.3s ease; }
         @keyframes fadeInAdmin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

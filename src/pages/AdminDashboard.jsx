@@ -36,17 +36,29 @@ const AdminDashboard = () => {
   const { user } = useOutletContext();
   const [db, setDb] = useState(getDB);
   const [toast, setToast] = useState(null);
+  const [dbError, setDbError] = useState(null);
 
   // Reload DB state
   const refreshDB = useCallback(async () => {
     if (isMockMode) {
       setDb(getDB());
+      setDbError(null);
     } else {
       try {
         const [shopsRes, regsRes] = await Promise.all([
           supabase.from('shops').select('*'),
           supabase.from('registrations').select('*')
         ]);
+        
+        if (shopsRes.error) {
+          setDbError(`Shops query failed: ${shopsRes.error.message} (${shopsRes.error.code})`);
+          return;
+        }
+        if (regsRes.error) {
+          setDbError(`Registrations query failed: ${regsRes.error.message} (${regsRes.error.code})`);
+          return;
+        }
+
         setDb({
           shops: shopsRes.data || [],
           registrations: regsRes.data || [],
@@ -55,8 +67,10 @@ const AdminDashboard = () => {
           orders: [],
           menu_views: []
         });
+        setDbError(null);
       } catch (err) {
         console.error('Error fetching admin dashboard data:', err);
+        setDbError(`Unexpected error: ${err.message || err}`);
       }
     }
   }, []);
@@ -339,8 +353,25 @@ const AdminDashboard = () => {
         color: isMockMode ? '#f87171' : '#34d399'
       }}>
         <span>Database Mode: {isMockMode ? '⚠️ Mock Mode (Local Storage)' : '🟢 Real Supabase Connected'}</span>
-        {!isMockMode && <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>URL: {supabase.supabaseUrl}</span>}
       </div>
+      {dbError && (
+        <div style={{
+          padding: '16px',
+          borderRadius: '12px',
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          color: '#fca5a5',
+          marginBottom: '20px',
+          fontSize: '0.9rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
+        }}>
+          <span style={{ fontWeight: 'bold' }}>⚠️ Database Query Error:</span>
+          <span>{dbError}</span>
+          <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>Please verify that you have run all SQL migration scripts in your Supabase SQL editor.</span>
+        </div>
+      )}
       <style>{`
         .admin-dashboard-page { animation: fadeInAdmin 0.3s ease; }
         @keyframes fadeInAdmin { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
