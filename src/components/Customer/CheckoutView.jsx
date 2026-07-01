@@ -280,17 +280,9 @@ const CheckoutView = ({
                 <span>Subtotal</span>
                 <span>₹{grandTotal.toFixed(2)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>CGST (2.5%)</span>
-                <span>₹{(grandTotal * 0.025).toFixed(2)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>SGST (2.5%)</span>
-                <span>₹{(grandTotal * 0.025).toFixed(2)}</span>
-              </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.92rem', fontWeight: '800', color: '#ffffff', marginTop: '4px' }}>
                 <span>Grand Total</span>
-                <span>₹{(grandTotal * 1.05).toFixed(2)}</span>
+                <span>₹{grandTotal.toFixed(2)}</span>
               </div>
             </div>
 
@@ -318,7 +310,7 @@ const CheckoutView = ({
             Total to pay
           </div>
           <div style={{ fontSize: '1.4rem', fontWeight: '800', color: '#ffffff', marginTop: '2px' }}>
-            ₹{(grandTotal * 1.05).toFixed(2)}
+            ₹{grandTotal.toFixed(2)}
           </div>
         </div>
 
