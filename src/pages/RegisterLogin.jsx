@@ -246,6 +246,7 @@ const RegisterLogin = () => {
           {
             shop_name: form.shopName,
             owner_name: form.ownerName,
+            phone: form.mobile,
             mobile: form.mobile,
             email: form.email.toLowerCase(),
             address: form.address,
@@ -253,6 +254,7 @@ const RegisterLogin = () => {
             tables: parseInt(form.tables) || 5,
             logo_url: logoPreview || null,
             status: 'PENDING',
+            submitted_at: new Date().toISOString(),
             user_id: data?.user?.id || null
           }
         ]);

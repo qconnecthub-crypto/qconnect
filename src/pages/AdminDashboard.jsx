@@ -238,7 +238,11 @@ const AdminDashboard = () => {
 
         // 4. Update registration status
         const { error: regUpdateError } = await supabase.from('registrations')
-          .update({ status: 'APPROVED' })
+          .update({ 
+            status: 'APPROVED',
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user?.email || 'Admin'
+          })
           .eq('id', regId);
         if (regUpdateError) throw regUpdateError;
 
@@ -283,7 +287,12 @@ const AdminDashboard = () => {
         if (!reg) return;
 
         const { error } = await supabase.from('registrations')
-          .update({ status: 'REJECTED', rejection_reason: reason })
+          .update({ 
+            status: 'REJECTED', 
+            rejection_reason: reason,
+            reviewed_at: new Date().toISOString(),
+            reviewed_by: user?.email || 'Admin'
+          })
           .eq('id', regId);
         if (error) throw error;
 
