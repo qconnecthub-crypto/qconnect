@@ -10,6 +10,7 @@ import MenuGrid from '../components/Customer/MenuGrid';
 import Cart from '../components/Customer/Cart';
 import ActiveOrderTracker from '../components/Customer/ActiveOrderTracker';
 import ItemDetailModal from '../components/Customer/ItemDetailModal';
+import CheckoutView from '../components/Customer/CheckoutView';
 
 const getNow = () => Date.now();
 
@@ -100,6 +101,7 @@ const CustomerMenu = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [orderNotes, setOrderNotes] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const [activeOrder, setActiveOrder] = useState(null);
   const [isTableDeactivated, setIsTableDeactivated] = useState(false);
@@ -338,7 +340,7 @@ const CustomerMenu = () => {
 
   const getCartItemCount = () => Object.values(cart).reduce((sum, entry) => sum + (entry.quantity || 0), 0);
 
-  const placeOrder = async () => {
+  const placeOrder = async (paymentMethod = 'Pay After Meal', customTableNumber = '') => {
     if (Object.keys(cart).length === 0) return;
     
     const lastOrder = localStorage.getItem('last_order_placed');
@@ -347,13 +349,10 @@ const CustomerMenu = () => {
       return;
     }
 
-    let finalTableNumber = tableNumber;
-    if (finalTableNumber === 'Unknown') {
-      if (!manualTableNumber.trim()) {
-        alert("Please enter your table number to place the order.");
-        return;
-      }
-      finalTableNumber = manualTableNumber.trim();
+    let finalTableNumber = customTableNumber || tableNumber;
+    if (finalTableNumber === 'Unknown' || !finalTableNumber.trim()) {
+      alert("Please enter your table number to place the order.");
+      return;
     }
 
     setIsPlacingOrder(true);
@@ -418,7 +417,8 @@ const CustomerMenu = () => {
       p_table_number: finalTableNumber,
       p_table_id: tableId,
       p_notes: finalNotes,
-      p_cart_items: cartItemsArr
+      p_cart_items: cartItemsArr,
+      p_payment_method: paymentMethod
     });
 
     if (orderError || !orderData) {
@@ -454,6 +454,7 @@ const CustomerMenu = () => {
     setCart({});
     localStorage.removeItem(`cart_${shopId}`);
     setIsCartOpen(false);
+    setIsCheckoutOpen(false);
     setIsPlacingOrder(false);
   };
 
@@ -559,6 +560,24 @@ const CustomerMenu = () => {
     );
   }
 
+  if (isCheckoutOpen) {
+    return (
+      <CheckoutView
+        shop={shop}
+        tableNumber={tableNumber}
+        setTableNumber={setTableNumber}
+        cart={cart}
+        items={items}
+        getCartTotal={getCartTotal}
+        getCartItemCount={getCartItemCount}
+        placeOrder={placeOrder}
+        isPlacingOrder={isPlacingOrder}
+        onBack={() => setIsCheckoutOpen(false)}
+        isDarkMode={isDarkMode}
+      />
+    );
+  }
+
   return (
     <div className={`customer-page-wrapper ${isDarkMode ? 'customer-dark-mode' : ''}`} style={{ paddingBottom: getCartItemCount() > 0 ? '100px' : '0', transition: 'background-color 0.5s ease, color 0.5s ease' }}>
       
@@ -608,8 +627,10 @@ const CustomerMenu = () => {
         getCartItemCount={getCartItemCount}
         isCartOpen={isCartOpen}
         setIsCartOpen={setIsCartOpen}
-        placeOrder={placeOrder}
-        isPlacingOrder={isPlacingOrder}
+        onProceedToCheckout={() => {
+          setIsCartOpen(false);
+          setIsCheckoutOpen(true);
+        }}
         orderNotes={orderNotes}
         setOrderNotes={setOrderNotes}
         tableNumber={tableNumber}

@@ -11,8 +11,7 @@ const Cart = ({
   getCartItemCount, 
   isCartOpen, 
   setIsCartOpen, 
-  placeOrder, 
-  isPlacingOrder, 
+  onProceedToCheckout, 
   orderNotes, 
   setOrderNotes, 
   tableNumber, 
@@ -290,8 +289,8 @@ const Cart = ({
 
                 <button 
                   id="place-order-btn"
-                  onClick={placeOrder}
-                  disabled={Object.keys(cart).length === 0 || isPlacingOrder || hasUnavailableItems}
+                  onClick={onProceedToCheckout}
+                  disabled={Object.keys(cart).length === 0 || hasUnavailableItems}
                   className="customer-add-btn"
                   style={{
                     width: '100%',
@@ -299,7 +298,7 @@ const Cart = ({
                     borderRadius: '16px',
                     backgroundColor: hasUnavailableItems ? 'var(--text-muted)' : 'var(--color-accent)',
                     color: 'white',
-                    cursor: (isPlacingOrder || hasUnavailableItems) ? 'not-allowed' : 'pointer',
+                    cursor: hasUnavailableItems ? 'not-allowed' : 'pointer',
                     boxShadow: hasUnavailableItems ? 'none' : '0 8px 24px rgba(var(--color-accent-rgb), 0.3)',
                     display: 'flex',
                     justifyContent: 'center',
@@ -310,17 +309,8 @@ const Cart = ({
                   }}
                   aria-label="Proceed to checkout"
                 >
-                  {isPlacingOrder ? (
-                    <>
-                      <div className="spinner" style={{ width: '22px', height: '22px', border: '3px solid rgba(255,255,255,0.3)', borderTop: '3px solid white' }}></div>
-                      Placing Order...
-                    </>
-                  ) : (
-                    <>
-                      Proceed to Checkout
-                      <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>›</span>
-                    </>
-                  )}
+                  Proceed to Checkout
+                  <span style={{ fontSize: '1.1rem', fontWeight: 'bold' }}>›</span>
                 </button>
               </div>
             )}
