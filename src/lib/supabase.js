@@ -754,8 +754,12 @@ const mockSupabase = {
   }
 };
 
-if (typeof window !== 'undefined' && window.location.search.includes('mock=true')) {
-  localStorage.setItem('supabase_mock_mode', 'true');
+if (typeof window !== 'undefined') {
+  if (window.location.search.includes('mock=true')) {
+    localStorage.setItem('supabase_mock_mode', 'true');
+  } else if (supabaseUrl && !supabaseUrl.includes('placeholder-never-use')) {
+    localStorage.removeItem('supabase_mock_mode');
+  }
 }
 
 export const isMockMode = typeof window !== 'undefined' && (
